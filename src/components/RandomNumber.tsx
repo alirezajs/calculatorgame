@@ -7,10 +7,12 @@ export default function RandomNumber(props: {
   onPress: (id: number) => void;
 }) {
   function selectNumber() {
-    props.onPress(props.id);
+    if (!props.isDisabled) {
+      props.onPress(props.id);
+    }
   }
   return (
-    <TouchableOpacity onPress={selectNumber}>
+    <TouchableOpacity onPress={selectNumber} disabled={props.isDisabled}>
       <Text style={[styles.random, props.isDisabled && styles.disabled]}>
         {props.randomNumber}
       </Text>
