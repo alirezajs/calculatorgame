@@ -1,40 +1,75 @@
 import { StyleSheet, View, Text, ShadowPropTypesIOS } from "react-native";
 
 import RandomNumber from "./RandomNumber";
-import React, { useState } from "react";
 
-export default function Game(props: { randomNumberCount: number }) {
-  const randomNumbers = Array.from({ length: props.randomNumberCount }).map(
+import React from "react";
+
+interface gameProps {
+  randomNumberCount: number;
+}
+
+interface gameInterface {
+  selectedIds: number[];
+}
+
+class Game extends React.Component<gameProps, gameInterface> {
+  constructor(props: { randomNumberCount: number }) {
+    super(props);
+
+    this.state = {
+      selectedIds: [],
+    };
+
+    this.selectId = this.selectId.bind(this);
+  }
+
+  randomNumbers = Array.from({ length: this.props.randomNumberCount }).map(
     () => 1 + Math.floor(10 * Math.random())
   );
-  const [selectedNumbers, setSelectedNumber] = useState<number[]>([]);
 
-  const target = randomNumbers
-    .slice(0, props.randomNumberCount - 2)
+  target = this.randomNumbers
+    .slice(0, this.props.randomNumberCount - 2)
     .reduce((acc, curr) => acc + curr, 0);
 
-  function isNumberSelected(numberIndex: number) {
-    return selectedNumbers.indexOf(numberIndex) >= 0;
+  isIdSelected(numberIndex: number) {
+    return this.state.selectedIds.indexOf(numberIndex) >= 0;
   }
-  function selectNumber(numberIndex: number) {
-    setSelectedNumber([...selectedNumbers, numberIndex]);
+  selectId(numberIndex: number) {
+    this.setState((prevState) => ({
+      selectedIds: [...prevState.selectedIds, numberIndex],
+    }));
   }
-  return (
-    <View style={styles.container}>
-      <Text style={styles.target}>{target}</Text>
-      <View style={styles.randomContainer}>
-        {randomNumbers.map((randomNumber, index) => (
-          <RandomNumber
-            key={index}
-            id={index}
-            randomNumber={randomNumber}
-            isDisabled={isNumberSelected(index)}
-            onPress={selectNumber}
-          />
-        ))}
+
+  getStatus = (): "win" | "lost" | "playing" => {
+    const sumSelected = this.state.selectedIds.reduce((acc, curr) => {
+      return acc + this.randomNumbers[curr];
+    }, 0);
+    if (sumSelected === this.target) return "win";
+    if (sumSelected > this.target) return "lost";
+    return "playing";
+  };
+  render() {
+    const status = this.getStatus();
+    return (
+      <View style={styles.container}>
+        <Text>{status}</Text>
+        <Text style={[styles.target, styles[`status_${status}`]]}>
+          {this.target}
+        </Text>
+        <View style={styles.randomContainer}>
+          {this.randomNumbers.map((randomNumber, index) => (
+            <RandomNumber
+              key={index}
+              id={index}
+              randomNumber={randomNumber}
+              isDisabled={this.isIdSelected(index) || status !== "playing"}
+              onPress={this.selectId}
+            />
+          ))}
+        </View>
       </View>
-    </View>
-  );
+    );
+  }
 }
 
 const styles = StyleSheet.create({
@@ -55,4 +90,16 @@ const styles = StyleSheet.create({
     flexWrap: "wrap",
     justifyContent: "space-around",
   },
+  status_playing: {
+    backgroundColor: "#000",
+    color: "#fff",
+  },
+  status_lost: {
+    backgroundColor: "#b00",
+  },
+  status_win: {
+    backgroundColor: "#0ba700",
+  },
 });
+
+export default Game;

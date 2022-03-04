@@ -1,23 +1,41 @@
+import { ReactNode } from "react";
 import { StyleSheet, Text, TouchableOpacity } from "react-native";
+import React, { Component }from "react";
 
-export default function RandomNumber(props: {
+interface IRandomNumber {
   id: number;
   randomNumber: number;
   isDisabled: boolean;
   onPress: (id: number) => void;
-}) {
-  function selectNumber() {
-    if (!props.isDisabled) {
-      props.onPress(props.id);
+}
+
+export default class RandomNumber extends Component<IRandomNumber> {
+  constructor(props: IRandomNumber) {
+    super(props);
+    
+    this.selectNumber = this.selectNumber.bind(this);
+  }
+
+  selectNumber() {
+    if (!this.props.isDisabled) {
+      this.props.onPress(this.props.id);
     }
   }
-  return (
-    <TouchableOpacity onPress={selectNumber} disabled={props.isDisabled}>
-      <Text style={[styles.random, props.isDisabled && styles.disabled]}>
-        {props.randomNumber}
-      </Text>
-    </TouchableOpacity>
-  );
+
+ 
+
+  render(): ReactNode {
+    return (
+      <TouchableOpacity
+        onPress={this.selectNumber}
+        disabled={this.props.isDisabled}
+      >
+        <Text style={[styles.random, this.props.isDisabled && styles.disabled]}>
+          {this.props.randomNumber}
+        </Text>
+      </TouchableOpacity>
+    );
+  }
 }
 
 const styles = StyleSheet.create({
@@ -35,3 +53,4 @@ const styles = StyleSheet.create({
     opacity: 0.3,
   },
 });
+
