@@ -4,6 +4,8 @@ import RandomNumber from "./RandomNumber";
 
 import React from "react";
 
+import shuffle from "lodash.shuffle";
+
 interface GameProps {
   randomNumberCount: number;
   remindingSecond: number;
@@ -19,6 +21,7 @@ interface GameInterface {
   target: number;
   isIdSelected: (numberIndex: number) => boolean;
   selectId: (numberIndex: number) => void;
+  shuffledRandomNumbers: number[];
   CalculateGameStatus: (state: GameState) => "win" | "lost" | "playing";
 }
 class Game
@@ -77,6 +80,8 @@ class Game
     .slice(0, this.props.randomNumberCount - 2)
     .reduce((acc, curr) => acc + curr, 0);
 
+  shuffledRandomNumbers = shuffle(this.randomNumbers);
+
   isIdSelected(numberIndex: number) {
     return this.state.selectedIds.indexOf(numberIndex) >= 0;
   }
@@ -88,7 +93,7 @@ class Game
 
   CalculateGameStatus = (nextState: GameState): "win" | "lost" | "playing" => {
     const sumSelected = nextState.selectedIds.reduce((acc, curr) => {
-      return acc + this.randomNumbers[curr];
+      return acc + this.shuffledRandomNumbers[curr];
     }, 0);
     if (nextState.remindingSecond === 0) return "lost";
     if (sumSelected === this.target) return "win";
@@ -105,7 +110,7 @@ class Game
           {this.target}
         </Text>
         <View style={styles.randomContainer}>
-          {this.randomNumbers.map((randomNumber, index) => (
+          {this.shuffledRandomNumbers.map((randomNumber, index) => (
             <RandomNumber
               key={index}
               id={index}
