@@ -1,4 +1,10 @@
-import { StyleSheet, View, Text, ShadowPropTypesIOS } from "react-native";
+import {
+  StyleSheet,
+  View,
+  Text,
+  ShadowPropTypesIOS,
+  Button,
+} from "react-native";
 
 import RandomNumber from "./RandomNumber";
 
@@ -9,6 +15,7 @@ import shuffle from "lodash.shuffle";
 interface GameProps {
   randomNumberCount: number;
   remindingSecond: number;
+  onPlayAgain: () => void;
 }
 
 interface GameState {
@@ -106,6 +113,8 @@ class Game
       <View style={styles.container}>
         <Text>{this.gameStatus}</Text>
         <Text>{this.state.remindingSecond}</Text>
+       
+
         <Text style={[styles.target, styles[`status_${this.gameStatus}`]]}>
           {this.target}
         </Text>
@@ -122,6 +131,9 @@ class Game
             />
           ))}
         </View>
+        {this.gameStatus != "playing" && (
+          <Button title="Play Again" onPress={this.props.onPlayAgain} />
+        )}
       </View>
     );
   }
